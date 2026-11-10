@@ -103,14 +103,17 @@ def test_create_user_with_faker(db_session):
  
 def test_create_multiple_users(db_session):
     """Create three fake users and check they are all saved."""
+    # CHANGED: record how many users exist first, because the table may
+    # already contain rows from other fixtures or tests.
+    initial_count = db_session.query(User).count()
+
     for _ in range(3):
         db_session.add(User(**create_fake_user()))
     db_session.commit()
- 
-    # CHANGED: check the database count instead of len(list), which only
-    # measured the Python list and proved nothing about the database.
-    assert db_session.query(User).count() == 3
- 
+
+    # CHANGED: check the database grew by exactly 3, instead of
+    # len(list), which only measured the Python list.
+    assert db_session.query(User).count() == initial_count + 3
  
 # ----------------------------------------------------------------------
 # Query tests
